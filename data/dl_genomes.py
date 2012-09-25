@@ -78,6 +78,6 @@ def dl(orgs):
 print("loaded")
 if __name__ == '__main__':
     pass
-#    dl(["Haemophilus_influenzae"])
-#    dl(gammas)
-#    dl(firmicutes)
+#    example usage:
+#    dl(["Haemophilus_influenzae","Escherichia coli"])
+
