@@ -94,22 +94,6 @@ def dictmap(d,xs):
     """Map d over xs"""
     return [d[x] for x in xs]
 
-def map_over_dict(f,d):
-    """[k:v] -> [k:f(v)]"""
-    fd = {x:y for (x,y) in map(f,zip(d.keys(),d.values()))}
-    if type(d) is dict:
-        return fd
-    elif type(d) is type(defaultdict(list)):
-        return defaultdict(lambda :f(d.default_factory()),fd)
-
-def map_over_vals(f,d):
-    """[k:v] -> [x:y], f(k,v) = (x,y)"""
-    fd = {k:f(d[k]) for k in d}
-    if type(d) is dict:
-        return fd
-    elif type(d) is type(defaultdict(list)):
-        return defaultdict(lambda :f(d.default_factory()),fd)
-
 def pearson(x, y):
     return scipy.stats.pearsonr(x, y)[0]
 
@@ -121,16 +105,6 @@ def l2(x,y):
 
 def length(x, y):
     return len(x)
-
-def data2csv(data, filename, sep=", ",header=None,overwrite=False):
-    make_line = lambda row: sep.join([str(field) for field in row]) + "\n"
-    if filename in os.listdir('.') and not overwrite:
-        print "found ",filename
-        pass
-    with open(filename, 'w') as f:
-        if header:
-            f.write(make_line(header))
-        f.write("".join([make_line(row) for row in data]))
 
 def get_name(obj):
     return head(dir(),lambda name: eval(name) == obj)
