@@ -1,3 +1,4 @@
+#!/usr/bin/python2.6
 import ftputil
 import string
 import os
@@ -77,7 +78,8 @@ def dl(orgs):
 
 print("loaded")
 if __name__ == '__main__':
-    pass
+    orgs = sys.argv[1]
+    dl(eval(orgs))
 #    example usage:
 #    dl(["Haemophilus_influenzae","Escherichia coli"])
 
