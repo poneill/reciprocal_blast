@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-
+#!/usr/bin/python2.6
 # Author: Sefa Kilic
 # Modifications: PON
 """
