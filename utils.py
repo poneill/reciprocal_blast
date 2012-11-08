@@ -3,7 +3,6 @@ for inclusion in this module is that the function could conceivably be
 used in an entirely unrelated project."""
 
 import os
-import scipy.stats
 from math import *
 from collections import Counter
 import random
