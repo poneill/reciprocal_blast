@@ -1,6 +1,6 @@
 """This file contains lists of organisms"""
 
-tset_orgs = ["Eschericia_coli",
+test_orgs = ["Eschericia_coli",
              "Pseudomonas_aeruginosa",
              "Haemophilus_influenzae"]
 
