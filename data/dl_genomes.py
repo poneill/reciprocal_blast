@@ -78,6 +78,8 @@ def dl(orgs):
 
 print("loaded")
 if __name__ == '__main__':
+    if len(sys.argv) == 0:
+        print "input the name of a group of organisms defined in orgs.py"
     orgs = sys.argv[1]
     dl(eval(orgs))
 #    example usage:
