@@ -9,10 +9,13 @@ $ ./setup_slurms.py list_of_species_names.txt
 
 Preconditions:
 
+Postconditions:
+
 """
 
 import os,sys,time
 from string import Template
+sys.path.append("..")
 from utils import *
 
 ORG_PATH = "../data"
