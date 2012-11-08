@@ -88,12 +88,3 @@ if __name__ == '__main__':
         new_orgs = None
     print ""
     reciprocal_blasts2(orgs,new_orgs)
-    
-    # for org1,org2 in choose2(all_orgs):
-    #     if (org1 in orgs and org2 in new_orgs or
-    #         org1 in new_orgs and org2 in orgs):
-    #         print org1,org2
-    #         filename_old = "../blast_results/results_%s_%s.txt" % (org1,org2)
-    #         filename_new = "../blast_results/sendables/results_%s_%s.txt" % (org1,org2)
-    #         os.system('cp %s %s' % (filename_old,filename_new))
-    # 
