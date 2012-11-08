@@ -32,9 +32,9 @@ def dl(orgs):
             continue
         print "found " + str(len(org_dirs)) + " results"
         if len(org_dirs) > 1:
-            print "choose a directory:"
             for i,v in enumerate(org_dirs):
                 print i,v
+            print "choose a directory:"
             default= (filter(lambda d: org_matches_dir(org, d),home_dirs))
             if default:
                 print "press (Enter) for default: %s" % default[0]
@@ -75,11 +75,14 @@ def dl(orgs):
     print "Failed:"
     for failure in failures:
         print failure
+    if len(failures) == 0:
+        print "None"
 
 print("loaded")
 if __name__ == '__main__':
-    if len(sys.argv) == 0:
-        print "input the name of a group of organisms defined in orgs.py"
+    if len(sys.argv) < 2:
+        print "Error: no list provided.  input the name of a list of organisms defined in orgs.py"
+        exit()
     orgs = sys.argv[1]
     dl(eval(orgs))
 #    example usage:
