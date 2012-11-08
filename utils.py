@@ -4,7 +4,6 @@ used in an entirely unrelated project."""
 
 import os
 from math import *
-from collections import Counter
 import random
 
 iota = lambda x:x #it is sometimes useful to have the identity
