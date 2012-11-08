@@ -62,6 +62,7 @@ def reciprocal_blasts2(orgs,new_orgs=None):
 #            org_dir = head([od for od in org_dirs if org1 in od])
             print "looking for data directory for ", org1
             org_dir = head([od for od in org_dirs if org_matches_dir(org1,od)])
+            print ORG_PATH,org_dir
             full_org_dir = os.path.join(ORG_PATH,org_dir)
             fasta_file = head([f for f in os.listdir(full_org_dir)
                                             if f.endswith(file_ext)])
