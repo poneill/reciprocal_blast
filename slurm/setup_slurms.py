@@ -1,10 +1,22 @@
 #!/usr/bin/python2.6
 
+"""This script accepts a list species names and sets up slurm jobs to
+perform pair-wise reciprocal BLAST searches between them.
+
+Usage:
+
+$ ./setup_slurms.py list_of_species_names.txt
+
+Preconditions:
+
+"""
+
 import os,sys,time
 from string import Template
 from utils import *
 
 ORG_PATH = "../data"
+BLAST_PATH = "../../ncbi-blast-2.2.26+/bin/blastp"
 BLAST_RESULTS_PATH = '../blast_results'
 DB_PATH = '../blastdb'
 PARTITION = "batch"
@@ -61,7 +73,8 @@ def reciprocal_blasts2(orgs,new_orgs=None):
                                                   partition=PARTITION,
                                                   query=full_fasta_file,
                                                   db=full_db_path,
-                                                  outfile=full_out_file))
+                                                  outfile=full_out_file,
+                                                  blast_path=BLAST_PATH))
             os.system("sbatch %s" % slurm_file)
             print "finished",org1, org2,"at", time.ctime()
 
@@ -75,7 +88,7 @@ slurm_template = Template("""#!/bin/bash
 #SBATCH --partition=${partition}
 #SBATCH --qos=short
 
-../../ncbi-blast-2.2.26+/bin/blastp -query ${query} -db ${db} -out ${outfile} -outfmt 5 -task blastp""")
+${blast_path} -query ${query} -db ${db} -out ${outfile} -outfmt 5 -task blastp""")
 
 
 if __name__ == '__main__':
