@@ -49,7 +49,7 @@ def reciprocal_blasts2(orgs,new_orgs=None):
         for org2 in all_orgs:
             print "starting on: ",org1, org2, "at", time.ctime()
             out_file = "results_%s_%s.txt" % (org1,org2)
-            same_org = org1 == org2
+            same_org = (org1 == org2)
             already_done = (new_orgs and not (org1 in new_orgs or
                                               org2 in new_orgs))
             if same_org or already_done:
