@@ -21,7 +21,8 @@ def parse_whog():
                 cogs[category].extend(gene)
     return cogs
 
-cogs = parse_whog()
+# cogs = parse_whog()
+
 def get_cog(locus_tag):
     for cat in cogs:
         if locus_tag in cogs[cat]:

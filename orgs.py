@@ -1,5 +1,9 @@
 """This file contains lists of organisms"""
 
+test_orgs = ["Escherichia_coli",
+             "Pseudomonas_aeruginosa",
+             "Haemophilus_influenzae"]
+
 orgs = ["Acinetobacter_ADP1",
         "Pseudomonas_fluorescens", 
         "Acinetobacter_baumannii", 

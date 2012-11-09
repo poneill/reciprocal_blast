@@ -1,0 +1,115 @@
+#+TITLE: Reciprocal BLAST and you!
+#+AUTHOR: Patrick O'Neill
+#+EMAIL: pon2@umbc.edu
+
+* Introduction
+  In this document we will walk step by step through the process of
+  conducting pair-wise reciprocal BLAST searches for a non-trivial
+  number of genomes.  In what follows, it is assumed that you have
+  cloned this Git repository to your local machine.  If you have not
+  done so already, do so now by typing:
+
+: git clone git://github.com/poneill/reciprocal_blast.git
+
+  which will create a copy of the repository locally.  If you wish to
+  run jobs remotely on a cluster with SLURM, clone the repository
+  into a remote directory for which you have =+w= and =+x= as well.
+
+  Basic comfort with the command line is also assumed.  Command line
+  instructions will be prefaced by a "=$=", i.e.
+
+: $ ls
+
+  is an instruction to type "ls" at the terminal.
+
+* Setting up
+
+  In this work-flow we assume that you have a list of species for
+  which you want to conduct pairwise reciprocal BLAST searches.  
+
+** Defining the list of species
+
+   Open the file =orgs.py= and enter your list of organisms.  Here is a concrete example:
+
+: your_orgs = ["Escherichia_coli",
+:             "Pseudomonas_aeruginosa",
+:             "Haemophilus_influenzae"]
+
+   my list is named =test_orgs= and contains three members.  Genus
+   name is capitalized, species name is lowercase, and an underscore
+   separates the two.  If any of your species constitutes a weird edge
+   case (I'm looking at you, "Psychrobacter sp. PRwf") just open up
+   the [[ftp.ncbi.nih.gov/genomes/Bacteria][NCBI's bacterial genome FTP page] 
+   in a browser window and copy the strain name as given there.
+
+** Downloading genomes
+
+   After the list is defined, =cd= to the =data= directory and type:
+
+: $ ./dl_genomes.py your_orgs
+
+   where =your_orgs=.  
+
+   The genome download script mostly tries to do the right thing.  If
+   it gets in over its head, it will ask you for advice.  This is just
+   to say that you should not wander too far from the keyboard while
+   your genomes are downloading.
+
+** Building databases
+
+   After your genomes have downloaded, open =reciprocal_blast.py= in
+   an interactive Python session.  From the command line, you can do this by typing:
+
+: $ python -i reciprocal_blast.py
+
+Then type:
+
+: >>> populate_dbs(your_orgs)
+
+* BLASTing
+
+** BLASTing locally
+
+   If you plan to run all of you jobs locally, just keep following the
+   module documentation for =reciprocal_blast.py=.
+
+** BLASTing remotely
+   If you have a large number of jobs, however, it is advisable to run
+   them on a cluster.  First, =scp= the genomes and the BLAST databases
+   to the cluster (in zipped form, probably), so that the genomes are
+   living in the remote =data= folder and the database files in the
+   remote =blastdb= folder; the remote directory structure should
+   mirror the local directory structure.
+
+   =cd= to the =slurm= directory and make a file called
+   =your_orgs.txt" that lists your orgs separated by newlines, e.g.:
+
+: Escherichia_coli
+: Pseudomonas_aeruginosa
+: Haemophilus_influenzae
+
+   Now run:
+
+: $ ./setup_slurms your_orgs.txt
+
+and wait for your results.  
+
+* Post-processing
+  After your runs have finished (which you can check with =squeue=),
+  the folder =blast_results= will contain a file of the form
+  =results_A_B.txt= for every organism A and B in your list.  Copy the
+  contents of that folder back to the local =blast_results= directory
+  (again, probably want to zip it on the highest compression
+  settings).
+
+  Finally, open up =reciprocal_blast.py= in an interactive session
+  again and continue the module documentation:
+
+: >>> collate_reciprocal_blasts(your_orgs)
+
+  will parse the XML and generate for each pair of organisms, a
+tab-separated file whose lines consist of a pair of locus tags, one
+from each organism, if the locus tags are reciprocal blast hits.
+
+
+
