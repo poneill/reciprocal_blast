@@ -40,7 +40,7 @@
    name is capitalized, species name is lowercase, and an underscore
    separates the two.  If any of your species constitutes a weird edge
    case (I'm looking at you, "Psychrobacter sp. PRwf") just open up
-   the [[http://ftp.ncbi.nih.gov/genomes/Bacteria][NCBI's bacterial genome FTP page] ]
+   the [[http://ftp.ncbi.nih.gov/genomes/Bacteria][NCBI's bacterial genome FTP page]]
    in a browser window and copy the strain name as given there.
 
 ** Downloading genomes
