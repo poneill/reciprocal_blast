@@ -29,7 +29,8 @@
 
 ** Defining the list of species
 
-   Open the file =orgs.py= and enter your list of organisms.  Here is a concrete example:
+   Open the file =orgs.py= and add your list of organisms to the file.
+   Here is a concrete example:
 
 : your_orgs = ["Escherichia_coli",
 :             "Pseudomonas_aeruginosa",
@@ -39,7 +40,7 @@
    name is capitalized, species name is lowercase, and an underscore
    separates the two.  If any of your species constitutes a weird edge
    case (I'm looking at you, "Psychrobacter sp. PRwf") just open up
-   the [[ftp.ncbi.nih.gov/genomes/Bacteria][NCBI's bacterial genome FTP page] 
+   the [[ftp.ncbi.nih.gov/genomes/Bacteria][NCBI's bacterial genome FTP page] ]
    in a browser window and copy the strain name as given there.
 
 ** Downloading genomes
@@ -48,7 +49,7 @@
 
 : $ ./dl_genomes.py your_orgs
 
-   where =your_orgs=.  
+   where =your_orgs= is the name of the list defined in =orgs.py=.
 
    The genome download script mostly tries to do the right thing.  If
    it gets in over its head, it will ask you for advice.  This is just
@@ -82,7 +83,7 @@ Then type:
    mirror the local directory structure.
 
    =cd= to the =slurm= directory and make a file called
-   =your_orgs.txt" that lists your orgs separated by newlines, e.g.:
+   =your_orgs.txt= that lists your orgs separated by newlines, e.g.:
 
 : Escherichia_coli
 : Pseudomonas_aeruginosa
@@ -93,6 +94,12 @@ Then type:
 : $ ./setup_slurms your_orgs.txt
 
 and wait for your results.  
+
+Why must this process be so disjointed?  Because =tara=, in its
+barbarity, only supports python2.4.  Rather than rewrite the entire
+suite of tools for 2.4 compliance, we have elected to rewrite only
+what is necessary.  This requires shunting some data back and forth
+between the 2.6 and 2.4 components of the codebase.
 
 * Post-processing
   After your runs have finished (which you can check with =squeue=),
