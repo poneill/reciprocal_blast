@@ -17,6 +17,7 @@ import os,sys,time
 from string import Template
 sys.path.append("..")
 from utils import *
+from orgs import *
 
 ORG_PATH = "../data"
 BLAST_PATH = "../../ncbi-blast-2.2.26+/bin/blastp"
@@ -97,11 +98,9 @@ ${blast_path} -query ${query} -db ${db} -out ${outfile} -outfmt 5 -task blastp""
 
 
 if __name__ == '__main__':
-    orgs_file = sys.argv[1]
-    orgs = [org.strip() for org in open(orgs_file).readlines()]
+    orgs = eval(sys.argv[1])
     try:
-        new_orgs_file = sys.argv[2]
-        new_orgs = [new_org.strip() for new_org in open(new_orgs_file).readlines()]
+        new_orgs = eval(sys.argv[2])
     except IndexError:
         new_orgs = None
     print ""
