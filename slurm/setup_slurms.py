@@ -52,8 +52,9 @@ def watch_until_free(slurm):
         command = "ps aux"
         search_term = "blast"
     while True:
-        result = subprocess.Popen("squeue",shell=True,stdout=subprocess.PIPE)
+        result = subprocess.Popen(command,shell=True,stdout=subprocess.PIPE)
         job_count = result.stdout.read().count(search_term)
+        print "currently ", job_count, "jobs in queue" 
         if job_count < job_limit:
             return
         else:
