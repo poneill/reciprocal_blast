@@ -53,7 +53,7 @@ def watch_until_free(slurm):
         search_term = "blast"
     while True:
         result = subprocess.Popen("squeue",shell=True,stdout=subprocess.PIPE)
-        job_count = result.stdout.read().count(username)
+        job_count = result.stdout.read().count(search_term)
         if job_count < job_limit:
             return
         else:
@@ -165,4 +165,6 @@ if __name__ == '__main__':
         one_way = bool(sys.argv[5])
     if num_args == 7:
         PARTITION = sys.argv[6]
-    reciprocal_blasts2(orgs,new_orgs,program,intra_new_orgs)
+    print "one_way:",one_way
+    reciprocal_blasts2(orgs,new_orgs,program,intra_new_orgs=intra_new_orgs,
+                       one_way=one_way)
