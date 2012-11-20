@@ -44,7 +44,13 @@ def populate_dbs(orgs):
               'db': os.path.join(DB_PATH,org)}
         makedb(sp)
 
-def watch_squeue_until_free():
+def watch_until_free(slurm):
+    if slurm:
+        command = "squeue"
+        search_term = username
+    else:
+        command = "ps aux"
+        search_term = "blast"
     while True:
         result = subprocess.Popen("squeue",shell=True,stdout=subprocess.PIPE)
         job_count = result.stdout.read().count(username)
@@ -53,10 +59,12 @@ def watch_squeue_until_free():
         else:
             print "job queue full, sleeping"
             time.sleep(10)
+
+     
     
-def reciprocal_blasts2(orgs,new_orgs=[],program="blastp",intra_new_orgs=True,one_way=False):
+def reciprocal_blasts2(orgs,new_orgs=[],program="blastp",intra_new_orgs=True,one_way=False,slurm=False):
     evalue = 1e-10
-    BLAST_PATH = "../../ncbi-blast-2.2.26+/bin/" + program
+    BLAST_PATH = program
     print orgs
     print new_orgs
     all_orgs = orgs + new_orgs
@@ -91,49 +99,70 @@ def reciprocal_blasts2(orgs,new_orgs=[],program="blastp",intra_new_orgs=True,one
             if out_file in results_contents:
                 print "found results, skipping", org1, org2
                 continue
-            slurm_file = "%s_%s.slurm" % (org1,org2)
-            with open(slurm_file,'w') as f:
-                f.write(slurm_template.substitute(job_name="%s_%s" % (org1,org2),
-                                                  partition=PARTITION,
-                                                  query=full_fasta_file,
-                                                  db=full_db_path,
-                                                  outfile=full_out_file,
-                                                  blast_path=BLAST_PATH,
-                                                  evalue=evalue))
-            watch_squeue_until_free()
-            os.system("sbatch %s" % slurm_file)
-            print "finished",org1, org2,"at", time.ctime()
+            blast_string = Template("""${blast_path} -query ${query} -db ${db}\
+ -out ${outfile} -outfmt 5 -evalue ${evalue}""").substitute(blast_path=BLAST_PATH,
+                                                            query=full_fasta_file,
+                                                            db=full_db_path,
+                                                            outfile=full_out_file,
+                                                            evalue=evalue)
+            job_file = write_blast_job(blast_string,org1,org2,slurm)
+            watch_until_free(slurm)
+            run_job(job_file,slurm)
 
-def org_matches_dir(org,org_dir):
-    return all(word.lower() in org_dir.lower() for word in org.split('_'))
-
-slurm_template = Template("""#!/bin/bash
-#SBATCH --job-name=${job_name}
+def write_blast_job(blast_string,org1,org2,slurm):
+    print "slurm:",slurm
+    slurm_header_template = Template("""#SBATCH --job-name=${job_name}
 #SBATCH --output=${job_name}.out
 #SBATCH --error=${job_name}.err
 #SBATCH --partition=${partition}
-#SBATCH --qos=medium
+#SBATCH --qos=medium""")
+    job_template = Template("""#!/bin/bash
+${slurm_headers}
+${blast_string}
+""")
+    job_file = ("%s_%s" % (org1,org2)) + (".slurm" if slurm else ".sh")
+    print "job_file:",job_file
+    if slurm:
+        slurm_header_string = slurm_header_template.substitute(job_name=job_name,
+                                                               partition=PARTITION)
+        job_string = job_template.substitute(blast_string=blast_string,
+                                             slurm_headers=slurm_headers)
+    else:
+        job_string = job_template.substitute(blast_string=blast_string,
+                                             slurm_headers="")
+    with open(job_file,'w') as f:
+                f.write(job_string)
+    return job_file    
 
-${blast_path} -query ${query} -db ${db} -out ${outfile} -outfmt 5 -evalue ${evalue}""")
+def run_job(job_file,slurm):
+    print "running job: ",job_file
+    print "slurm:",slurm
+    command = "squeue" if slurm else "bash"
+    print "command:",command
+    subprocess.Popen([command,job_file],stdin=None,stdout=None,stderr=None,
+                    close_fds=None)
 
+    
+def org_matches_dir(org,org_dir):
+    return all(word.lower() in org_dir.lower() for word in org.split('_'))
 
-if __name__ == '__main__':
-    orgs = eval(sys.argv[1])
-    num_args = len(sys.argv)
-    new_orgs = []
-    program = "blastp"
-    PARTITION = "batch"
-    one_way = False
-    intra_new_orgs = True
-    #usage: ./setup_slurms orgs new_orgs program intra_new_orgs one_way partition
-    if num_args >= 3: #including self
-        new_orgs= eval(sys.argv[2])
-    if num_args >= 4:
-        program = sys.argv[3]
-    if num_args >= 5:
-        intra_new_orgs = bool(sys.argv[4])
-    if num_args >= 6:
-        one_way = bool(sys.argv[5])
-    if num_args == 7:
-        PARTITION = sys.argv[6]
-    reciprocal_blasts2(orgs,new_orgs,program,intra_new_orgs)
+# if __name__ == '__main__':
+#     orgs = eval(sys.argv[1])
+#     num_args = len(sys.argv)
+#     new_orgs = []
+#     program = "blastp"
+#     PARTITION = "batch"
+#     one_way = False
+#     intra_new_orgs = True
+#     #usage: ./setup_slurms orgs new_orgs program intra_new_orgs one_way partition
+#     if num_args >= 3: #including self
+#         new_orgs= eval(sys.argv[2])
+#     if num_args >= 4:
+#         program = sys.argv[3]
+#     if num_args >= 5:
+#         intra_new_orgs = bool(sys.argv[4])
+#     if num_args >= 6:
+#         one_way = bool(sys.argv[5])
+#     if num_args == 7:
+#         PARTITION = sys.argv[6]
+#     reciprocal_blasts2(orgs,new_orgs,program,intra_new_orgs)
