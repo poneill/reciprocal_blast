@@ -189,14 +189,16 @@ def extend_site(genome, sbjct_start, sbjct_end, query_start, query_end):
 #
 
 
-def populate_dbs(orgs):
+def populate_dbs(orgs,file_ext = ".faa"):
     """given a list of organism names,  find directories,  grab files
     and construct databases"""
     org_dirs = os.listdir(ORG_PATH)
-    file_ext = ".faa"
     for org in orgs:
         print "constructing db for ",  org
         org_dir = head([od for od in org_dirs if org_matches_dir(org, od)])
+        if org_dir == []:
+            print "Warning: couldn't find data directory for ",org
+            continue
         full_org_dir = os.path.join(ORG_PATH, org_dir)
         fasta_file = head([f for f in os.listdir(full_org_dir)
                            if f.endswith(file_ext)])
@@ -211,6 +213,7 @@ def reciprocal_blasts2(orgs):
     org_dirs = os.listdir(ORG_PATH)
     results_contents = os.listdir('blast_results')
     file_ext = '.faa'
+    evalue=10e-10
     for org1 in orgs:
         for org2 in orgs:
             print "starting on: ", org1, org2, "at", time.ctime()
@@ -228,9 +231,9 @@ def reciprocal_blasts2(orgs):
                 print "skipping", org1, org2
                 continue
             os.system(os.path.join(BLAST_BIN_PATH, 
-                      ('blastp -query %s -task blastp -db %s -out %s -outfmt 5'
+                      ('blastp -query %s -task blastp -db %s -out %s -outfmt 5 -evalue %s'
                        % (full_fasta_file, full_db_path, 
-                          os.path.join("blast_results", out_file)))))
+                          os.path.join("blast_results", out_file,evalue)))))
             print "finished", org1, org2, "at", time.ctime()
 
 def find_missing_results_files(orgs):
@@ -354,6 +357,63 @@ def parse_results(filename, query_locus_dict, target_locus_dict):
                     hits[query_locus] = (target_locus, cutoff)
                     found_best_hit = True 
     return hits
+
+def parse_best_hits(filename):
+    """Accept a file containing the results of blasting query_org against
+    target_org and return a dictionary of the form {protein in query_org: (first
+    blast hit in target_org,cutoff)}"""
+    hits = defaultdict(list)
+    query_def_pattern = re.compile(r"""<Iteration_query-def>(.*)</Iteration_query-def>""", re.X)
+    hit_def_pattern = re.compile(r"<Hit_def>(.*)</Hit_def>")
+    evalue_pattern =  re.compile(r"<Hsp_evalue>(.*?)</Hsp_evalue>")
+    cutoff = 1e-10
+    found_best_hit = False
+    with open(filename) as f:
+        for line in f:
+            query_def_match = query_def_pattern.search(line)
+            hit_def_match = hit_def_pattern.search(line)
+            evalue_match = evalue_pattern.search(line)
+            if query_def_match:
+                query_name = query_def_match.group(1)
+#                print "found query_name: %s" % query_name
+            elif hit_def_match:
+                hit_name = hit_def_match.group(1)
+#                print "found hit_name: %s" % hit_name
+            elif evalue_match:
+                evalue = float(evalue_match.group(1))
+ #               print "found evalue: %s" % str(evalue)
+                if evalue < cutoff:
+                    hits[query_name].append((hit_name, evalue))
+                    found_best_hit = True 
+    return hits
+
+def collate_reverse_blasts():
+    """Extract ref genome -> metagenome blast hits.  For each file in
+    blast_results/results_<org>_metagenome.txt,create a file of the form:
+
+    org_gene,metagenome_gene, e_value
+
+    (org_genes and metagenome_genes may in general be repeated on
+    separate lines.)
+
+    The output file is named reciprocal_results/ref_to_meta_<org>.csv
+    """
+
+    filenames = os.listdir('blast_results')
+    for filename in filenames:
+        if not (filename.startswith("results") and
+                filename.endswith("metagenome.txt")):
+                    continue
+        print "starting on: ",filename
+        full_filename = os.path.join("blast_results",filename)
+        org_name = re.findall("results_(.*)_metagenome.txt",filename)[0]
+        hits = parse_best_hits(full_filename)
+        outfile = "reciprocal_results/ref_to_meta_%s.csv" % org_name
+        with open(outfile,'w') as f:
+            for ref_gene in hits:
+                for (meta_gene,evalue) in hits[ref_gene]:
+                    f.write(",".join([ref_gene,meta_gene,str(evalue)]) + "\n")
+                    
 
 def find_reciprocals(d1, d2):
     """Given two dictionaries d1 and d1 collecting the matches
