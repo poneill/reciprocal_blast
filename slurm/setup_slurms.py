@@ -146,23 +146,23 @@ def run_job(job_file,slurm):
 def org_matches_dir(org,org_dir):
     return all(word.lower() in org_dir.lower() for word in org.split('_'))
 
-# if __name__ == '__main__':
-#     orgs = eval(sys.argv[1])
-#     num_args = len(sys.argv)
-#     new_orgs = []
-#     program = "blastp"
-#     PARTITION = "batch"
-#     one_way = False
-#     intra_new_orgs = True
-#     #usage: ./setup_slurms orgs new_orgs program intra_new_orgs one_way partition
-#     if num_args >= 3: #including self
-#         new_orgs= eval(sys.argv[2])
-#     if num_args >= 4:
-#         program = sys.argv[3]
-#     if num_args >= 5:
-#         intra_new_orgs = bool(sys.argv[4])
-#     if num_args >= 6:
-#         one_way = bool(sys.argv[5])
-#     if num_args == 7:
-#         PARTITION = sys.argv[6]
-#     reciprocal_blasts2(orgs,new_orgs,program,intra_new_orgs)
+if __name__ == '__main__':
+    orgs = eval(sys.argv[1])
+    num_args = len(sys.argv)
+    new_orgs = []
+    program = "blastp"
+    PARTITION = "batch"
+    one_way = False
+    intra_new_orgs = True
+    #usage: ./setup_slurms orgs new_orgs program intra_new_orgs one_way partition
+    if num_args >= 3: #including self
+        new_orgs= eval(sys.argv[2])
+    if num_args >= 4:
+        program = sys.argv[3]
+    if num_args >= 5:
+        intra_new_orgs = bool(sys.argv[4])
+    if num_args >= 6:
+        one_way = bool(sys.argv[5])
+    if num_args == 7:
+        PARTITION = sys.argv[6]
+    reciprocal_blasts2(orgs,new_orgs,program,intra_new_orgs)
