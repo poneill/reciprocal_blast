@@ -1,16 +1,7 @@
-#!/usr/bin/python2.6
+#!/usr/bin/python
 
 """This script accepts a list species names and sets up slurm jobs to
 perform pair-wise reciprocal BLAST searches between them.
-
-Usage:
-
-$ ./setup_slurms.py list_of_species_names.txt
-
-Preconditions:
-
-Postconditions:
-
 """
 
 import os,sys,time
