@@ -132,9 +132,9 @@ def run_job(job_file,slurm):
     print "slurm:",slurm
     command = "sbatch" if slurm else "bash"
     print "command:",command
-    # subprocess.Popen([command,job_file],stdin=None,stdout=None,stderr=None,
-    #                 close_fds=None)
-    os.system(command + " " + job_file)
+    subprocess.Popen([command,job_file],stdin=None,stdout=None,stderr=None,
+                     close_fds=None)
+    #os.system(command + " " + job_file)
 
     
 def org_matches_dir(org,org_dir):
