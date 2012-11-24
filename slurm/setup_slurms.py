@@ -14,7 +14,7 @@ Postconditions:
 """
 
 import os,sys,time
-import subprocess
+import subprocess,getopt
 from string import Template
 sys.path.append("..")
 from utils import *
@@ -121,13 +121,14 @@ def write_blast_job(blast_string,org1,org2,slurm):
 ${slurm_headers}
 ${blast_string}
 """)
-    job_file = ("%s_%s" % (org1,org2)) + (".slurm" if slurm else ".sh")
+    job_name = ("%s_%s" % (org1,org2))
+    job_file = job_name + (".slurm" if slurm else ".sh")
     print "job_file:",job_file
     if slurm:
         slurm_header_string = slurm_header_template.substitute(job_name=job_name,
                                                                partition=PARTITION)
         job_string = job_template.substitute(blast_string=blast_string,
-                                             slurm_headers=slurm_headers)
+                                             slurm_headers=slurm_header_string)
     else:
         job_string = job_template.substitute(blast_string=blast_string,
                                              slurm_headers="")
@@ -138,34 +139,57 @@ ${blast_string}
 def run_job(job_file,slurm):
     print "running job: ",job_file
     print "slurm:",slurm
-    command = "squeue" if slurm else "bash"
+    command = "sbatch" if slurm else "bash"
     print "command:",command
-    subprocess.Popen([command,job_file],stdin=None,stdout=None,stderr=None,
-                    close_fds=None)
+    # subprocess.Popen([command,job_file],stdin=None,stdout=None,stderr=None,
+    #                 close_fds=None)
+    os.system(command + " " + job_file)
 
     
 def org_matches_dir(org,org_dir):
     return all(word.lower() in org_dir.lower() for word in org.split('_'))
 
 if __name__ == '__main__':
-    orgs = eval(sys.argv[1])
-    num_args = len(sys.argv)
-    new_orgs = []
-    program = "blastp"
+    program = "../../ncbi-blast-2.2.26+/bin/blastp"
     PARTITION = "batch"
     one_way = False
     intra_new_orgs = True
-    #usage: ./setup_slurms orgs new_orgs program intra_new_orgs one_way partition
-    if num_args >= 3: #including self
-        new_orgs= eval(sys.argv[2])
-    if num_args >= 4:
-        program = sys.argv[3]
-    if num_args >= 5:
-        intra_new_orgs = bool(sys.argv[4])
-    if num_args >= 6:
-        one_way = bool(sys.argv[5])
-    if num_args == 7:
-        PARTITION = sys.argv[6]
-    print "one_way:",one_way
+    slurm = True
+    #usage: ./setup_slurms --orgs=orgs --new_orgs=new_orgs --program=program --no_intra_new_orgs --one_way --develop
+    args = ["orgs=","new_orgs=","program=","no_intra_new_orgs",
+            "one_way","develop","no_slurm"]
+    options,remainder = getopt.getopt(sys.argv[1:],"",args)
+    for opt,arg in options:
+        print "assigning opt:",opt,"arg:",arg 
+        if opt == "--orgs":
+            orgs = eval(arg)
+        elif opt == "--new_orgs":
+            new_orgs = eval(arg)
+        elif opt == "--program":
+            program = arg
+        elif opt == "--no_intra_new_orgs":
+            intra_new_orgs = False
+        elif opt == "--one_way":
+            one_way = True
+        elif opt == "--develop":
+            PARTITION = "develop"
+        elif opt == "--no_slurm":
+            slurm = False
+    for arg in ["orgs","new_orgs","program","intra_new_orgs",
+                "one_way","slurm","PARTITION"]:
+        print arg,eval(arg)
+    # if num_args >= 3: #including self
+    #     new_orgs= eval(sys.argv[2])
+    # if num_args >= 4:
+    #     program = sys.argv[3]
+    # if num_args >= 5:
+    #     intra_new_orgs = bool(sys.argv[4])
+    # if num_args >= 6:
+    #     one_way = bool(sys.argv[5])
+    # if num_args >= 7:
+    #     PARTITION = sys.argv[6]
+    # if num_args == 8:
+    #     slurm = sys.argv[7]
+    # print "one_way:",one_way
     reciprocal_blasts2(orgs,new_orgs,program,intra_new_orgs=intra_new_orgs,
-                       one_way=one_way)
+                       one_way=one_way,slurm=slurm)
