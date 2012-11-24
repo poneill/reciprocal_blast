@@ -15,7 +15,6 @@ ORG_PATH = "../data"
 BLAST_RESULTS_PATH = '../blast_results'
 DB_PATH = '../blastdb'
 username = "pon2"
-job_limit = 8
 
 def populate_dbs(orgs):
     """given a list of organism names, find directories, grab files
@@ -146,9 +145,10 @@ if __name__ == '__main__':
     one_way = False
     intra_new_orgs = True
     slurm = True
+    job_limit = 10
     #usage: ./setup_slurms --orgs=orgs --new_orgs=new_orgs --program=program --no_intra_new_orgs --one_way --develop
     args = ["orgs=","new_orgs=","program=","no_intra_new_orgs",
-            "one_way","develop","no_slurm"]
+            "one_way","develop","no_slurm","job_limit="]
     options,remainder = getopt.getopt(sys.argv[1:],"",args)
     for opt,arg in options:
         print "assigning opt:",opt,"arg:",arg 
@@ -166,6 +166,8 @@ if __name__ == '__main__':
             PARTITION = "develop"
         elif opt == "--no_slurm":
             slurm = False
+        elif opt == "--job_limit":
+            job_limit = eval(job_limit)
     for arg in ["orgs","new_orgs","program","intra_new_orgs",
                 "one_way","slurm","PARTITION"]:
         print arg,eval(arg)
