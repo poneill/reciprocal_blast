@@ -459,6 +459,18 @@ do_overs = ['Providencia_stuartii_ATCC_25827',
             'Catenibacterium_mitsuokai_DSM_15897',
             'Helicobacter_winghamensis_ATCC_BAA_430']
 
+do_overs2 = ['Ruminococcus_lactaris_ATCC_29176',
+             'Providencia_stuartii_ATCC_25827',
+             'Clostridium_spiroforme_DSM_1552',
+             'Clostridium_leptum_DSM_753',
+             'Enterococcus_faecalis_TX0104',
+             'Lactobacillus_ruminis_ATCC_25644']
+
+do_overs3 = ['Clostridium_spiroforme_DSM_1552',
+             'Clostridium_leptum_DSM_753',
+             'Enterococcus_faecalis_TX0104',
+             'Lactobacillus_ruminis_ATCC_25644']
+
 orgs = ["Acinetobacter_ADP1",
         "Pseudomonas_fluorescens", 
         "Acinetobacter_baumannii", 
