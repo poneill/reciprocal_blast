@@ -167,7 +167,7 @@ if __name__ == '__main__':
         elif opt == "--no_slurm":
             slurm = False
         elif opt == "--job_limit":
-            job_limit = eval(job_limit)
+            job_limit = eval(arg)
     for arg in ["orgs","new_orgs","program","intra_new_orgs",
                 "one_way","slurm","PARTITION"]:
         print arg,eval(arg)
